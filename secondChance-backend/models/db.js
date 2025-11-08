@@ -17,12 +17,24 @@ async function connectToDatabase() {
 
     // Task 1: Connect to MongoDB
     // {{insert code}}
+try{
+    await client.connect();
+    console.log('Connected to MongoDB');
 
     // Task 2: Connect to database giftDB and store in variable dbInstance
     //{{insert code}}
+dbInstance = client.db(dbName);
+console.log(`Connected to database: ${dbName}`);
 
     // Task 3: Return database instance
     // {{insert code}}
+    return dbInstance;
+} catch (error){
+    console.error('❌ Error connecting to MongoDB:', error);
+    throw error;
+} 
+
 }
+
 
 module.exports = connectToDatabase;
