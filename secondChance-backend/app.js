@@ -4,7 +4,7 @@ const express = require('express')
 const cors = require('cors')
 const pinoLogger = require('./logger')
 const connectToDatabase = require('./models/db')
-const { loadData } = require('./util/import-mongo/index')
+// const { loadData } = require('./util/import-mongo/index')
 
 const app = express()
 app.use(cors())
@@ -20,7 +20,7 @@ connectToDatabase()
 
 app.use(express.json())
 
-const path = require('path')
+// const path = require('path')
 // app.use('/images', express.static(path.join(__dirname, 'public', 'images')));
 app.use(express.static('public'))
 
@@ -45,15 +45,16 @@ app.use('/api/secondchance/items', secondChanceItemsRoutes)
 app.use('/api/secondchance/search', searchRoutes)
 
 // Global Error Handler
-app.use((err, req, res,  next) => {
+app.use((err, req, res, _next) => {
   console.error(err)
   res.status(500).send('Internal Server Error')
 })
-
+  
 app.get('/', (req, res) => {
   res.send('Inside the server')
 })
-
+  
 app.listen(port, () => {
   console.log(`Server running on port ${port}`)
 })
+  
