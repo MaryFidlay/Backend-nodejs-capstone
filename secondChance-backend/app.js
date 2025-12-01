@@ -1,59 +1,48 @@
-/* jshint esversion: 8 */
 require('dotenv').config()
 const express = require('express')
 const cors = require('cors')
 const pinoLogger = require('./logger')
+const path = require('path')
+
 const connectToDatabase = require('./models/db')
-// const { loadData } = require('./util/import-mongo/index')
 
 const app = express()
-app.use(cors())
-
+app.use('*', cors())
 const port = 3060
 
-// Connect to MongoDB
-connectToDatabase()
-  .then(() => {
-    pinoLogger.info('Connected to DB')
-  })
+// Connect to MongoDB; we just do this one time
+connectToDatabase().then(() => {
+  pinoLogger.info('Connected to DB')
+})
   .catch((e) => console.error('Failed to connect to DB', e))
 
 app.use(express.json())
 
-// const path = require('path')
-// app.use('/images', express.static(path.join(__dirname, 'public', 'images')));
-app.use(express.static('public'))
-
 // Route files
-// authRoutes Step 2
+const secondChanceRoutes = require('./routes/secondChanceItemsRoutes')
 const authRoutes = require('./routes/authRoutes')
-
-// Items API Task 1
-const secondChanceItemsRoutes = require('./routes/secondChanceItemsRoutes')
-
-// Search API Task 1
 const searchRoutes = require('./routes/searchRoutes')
-
 const pinoHttp = require('pino-http')
 const logger = require('./logger')
 
 app.use(pinoHttp({ logger }))
+app.use(express.static(path.join(__dirname, 'public')))
 
 // Use Routes
+app.use('/api/secondchance/items', secondChanceRoutes)
 app.use('/api/auth', authRoutes)
-app.use('/api/secondchance/items', secondChanceItemsRoutes)
 app.use('/api/secondchance/search', searchRoutes)
 
 // Global Error Handler
-app.use((err, req, res, _next) => {
+app.use((err, req, res) => {
   console.error(err)
   res.status(500).send('Internal Server Error')
 })
-  
+
 app.get('/', (req, res) => {
   res.send('Inside the server')
 })
-  
+
 app.listen(port, () => {
   console.log(`Server running on port ${port}`)
 })
